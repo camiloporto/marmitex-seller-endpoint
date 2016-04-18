@@ -7,6 +7,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 /**
  * Created by ur42 on 15/04/2016.
  */
@@ -27,4 +29,8 @@ public class Seller {
     @NotEmpty(message= "{br.com.camiloporto.marmitex.microservice.seller.PROFILE_REQUIRED}",
             groups= SellerServiceImpl.CreateRules.class)
     private String profileId;
+
+    private List<Menu> menus;
+
+    private String commentsForClients;
 }

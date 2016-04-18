@@ -1,8 +1,13 @@
 package br.com.camiloporto.marmitex.microservice.seller.service;
 
 import br.com.camiloporto.marmitex.microservice.MarmitexSellerEndpointApplication;
+import br.com.camiloporto.marmitex.microservice.seller.model.Menu;
+import br.com.camiloporto.marmitex.microservice.seller.model.MenuCategory;
+import br.com.camiloporto.marmitex.microservice.seller.model.MenuOption;
 import br.com.camiloporto.marmitex.microservice.seller.model.Seller;
 import br.com.camiloporto.marmitex.microservice.seller.repository.SellerRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -12,6 +17,7 @@ import org.testng.annotations.Test;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -33,12 +39,39 @@ public class SellerServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void shouldCreateNewSeller() {
+    public void shouldCreateNewSeller() throws JsonProcessingException {
         Seller s = new Seller();
         s.setName("Espaco e Sabor");
         s.setAddress("Jaguarari, 1056, lagoa nova");
         s.setProfileId("camiloporto@email.com");
+
+        MenuOption rice = new MenuOption("Rice");
+        MenuOption bean = new MenuOption("Bean");
+        MenuOption meat = new MenuOption("Meat");
+        MenuOption chicken = new MenuOption("Chicken");
+        MenuOption salad = new MenuOption("Green Salad");
+
+        MenuCategory carbo = new MenuCategory("Carbo");
+        carbo.setOptions(Arrays.asList(rice, bean));
+
+        MenuCategory protein = new MenuCategory("Protein");
+        protein.setOptions(Arrays.asList(meat, chicken));
+
+        MenuCategory veggs = new MenuCategory("Veggs");
+        veggs.setOptions(Arrays.asList(salad));
+
+
+        Menu mon = new Menu("Monday");
+        mon.setCategories(Arrays.asList(carbo, protein, veggs));
+
+        Menu tue = new Menu("Tuesday");
+        tue.setCategories(Arrays.asList(carbo, protein, veggs));
+
+        s.setMenus(Arrays.asList(mon, tue));
+
         Seller saved = sellerService.save(s);
+        String json = new ObjectMapper().writeValueAsString(saved);
+        System.out.println(json);
         Assert.assertNotNull(saved.getId());
     }
 
