@@ -11,6 +11,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.Validator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -33,6 +34,16 @@ public class SellerServiceImpl implements SellerService {
             throw new ConstraintViolationException(violations);
         }
         return sellerRepository.save(s);
+    }
+
+    @Override
+    public List<Seller> findByProfile(String profileId) {
+        return sellerRepository.findByProfileId(profileId);
+    }
+
+    @Override
+    public Seller findById(String id) {
+        return sellerRepository.findOne(id);
     }
 
     public interface CreateRules{}
