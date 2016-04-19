@@ -13,7 +13,7 @@ import java.util.List;
  * Created by ur42 on 15/04/2016.
  */
 @Getter @Setter
-@Document
+@Document(collection = "sellers")
 public class Seller {
 
     @Id

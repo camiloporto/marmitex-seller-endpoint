@@ -5,7 +5,7 @@
 
 	<groupId>br.com.camiloporto.marmitex.microservice</groupId>
 	<artifactId>marmitex-seller-endpoint</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>marmitex-seller-endpoint</name>
@@ -49,6 +49,12 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>6.8.21</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>

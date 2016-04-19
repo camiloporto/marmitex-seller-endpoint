@@ -38,6 +38,8 @@ public class SellerServiceTest extends AbstractTestNGSpringContextTests {
         sellerRepository.deleteAll();
     }
 
+    //FIXME configura Apps no heoku (mongoDB, URLs, parametros, application.properties, Travis, etc..)
+
     @Test
     public void shouldCreateNewSeller() throws JsonProcessingException {
         Seller s = new Seller();
