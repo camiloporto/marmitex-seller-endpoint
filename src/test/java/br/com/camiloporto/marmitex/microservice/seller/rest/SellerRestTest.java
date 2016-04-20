@@ -6,6 +6,7 @@ import br.com.camiloporto.marmitex.microservice.seller.model.MenuCategory;
 import br.com.camiloporto.marmitex.microservice.seller.model.MenuOption;
 import br.com.camiloporto.marmitex.microservice.seller.model.Seller;
 import br.com.camiloporto.marmitex.microservice.seller.repository.SellerRepository;
+import br.com.camiloporto.marmitex.microservice.seller.service.SellerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -23,6 +24,7 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,6 +42,9 @@ public class SellerRestTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private SellerRepository sellerRepository;
+
+    @Autowired
+    private SellerService sellerService;
 
 
     private MockMvc mvc;
@@ -88,6 +93,7 @@ public class SellerRestTest extends AbstractTestNGSpringContextTests {
         s.setMenus(Arrays.asList(mon, tue));
 
         String json = objectMapper.writeValueAsString(s);
+        System.out.println(json);
         mvc.perform(
             post("/seller")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -102,6 +108,50 @@ public class SellerRestTest extends AbstractTestNGSpringContextTests {
         Assert.assertFalse(result.isEmpty());
     }
 
-    //FIXME configura Apps no heoku (mongoDB, URLs, parametros, application.properties, Travis, etc..)
+    @Test
+    public void shouldGetSellerByProfileId() throws Exception {
+
+        Seller s = new Seller();
+        s.setName("Espaco e Sabor");
+        s.setAddress("Jaguarari, 1056, lagoa nova");
+        s.setProfileId("camiloporto@email.com");
+
+        MenuOption rice = new MenuOption("Rice");
+        MenuOption bean = new MenuOption("Bean");
+        MenuOption meat = new MenuOption("Meat");
+        MenuOption chicken = new MenuOption("Chicken");
+        MenuOption salad = new MenuOption("Green Salad");
+
+        MenuCategory carbo = new MenuCategory("Carbo");
+        carbo.setOptions(Arrays.asList(rice, bean));
+
+        MenuCategory protein = new MenuCategory("Protein");
+        protein.setOptions(Arrays.asList(meat, chicken));
+
+        MenuCategory veggs = new MenuCategory("Veggs");
+        veggs.setOptions(Arrays.asList(salad));
+
+
+        Menu mon = new Menu("Monday");
+        mon.setCategories(Arrays.asList(carbo, protein, veggs));
+
+        Menu tue = new Menu("Tuesday");
+        tue.setCategories(Arrays.asList(carbo, protein, veggs));
+
+        s.setMenus(Arrays.asList(mon, tue));
+
+        Seller saved = sellerService.save(s);
+
+        mvc.perform(
+                get("/seller/")
+                        .param("profileId", s.getProfileId())
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.menus[*].categories").exists());
+
+    }
 
 }

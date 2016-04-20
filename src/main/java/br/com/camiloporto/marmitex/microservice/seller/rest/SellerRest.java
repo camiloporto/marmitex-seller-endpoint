@@ -5,12 +5,10 @@ import br.com.camiloporto.marmitex.microservice.seller.service.SellerService;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,5 +30,19 @@ public class SellerRest {
         Map<String, Object> result = new HashMap<>();
         result.put("id", saved.getId());
         return result;
+    }
+
+
+    @RequestMapping(
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    )
+    public @ResponseBody Seller get(@RequestParam("profileId") String profileId) {
+        List<Seller> result = sellerService.findByProfile(profileId);
+        if(!result.isEmpty()) {
+            //FIXME should a profile have more than one Seller?
+            return result.get(0);
+        }
+        return null;
     }
 }

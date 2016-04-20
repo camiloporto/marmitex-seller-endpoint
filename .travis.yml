@@ -1,1 +1,6 @@
 language: java
+services:
+  - mongodb
+before_script:
+  - sleep 15
+  - mongo marmitex-seller --eval 'db.addUser("marmitex-seller", "marmitex-seller");'
