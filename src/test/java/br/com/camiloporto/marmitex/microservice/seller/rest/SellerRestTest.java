@@ -1,4 +1,4 @@
-package br.com.camiloporto.marmitex.microservice.seller;
+package br.com.camiloporto.marmitex.microservice.seller.rest;
 
 import br.com.camiloporto.marmitex.microservice.MarmitexSellerEndpointApplication;
 import br.com.camiloporto.marmitex.microservice.seller.model.Menu;
@@ -101,5 +101,7 @@ public class SellerRestTest extends AbstractTestNGSpringContextTests {
         List<Seller> result = sellerRepository.findByProfileId("camiloporto@email.com");
         Assert.assertFalse(result.isEmpty());
     }
+
+    //FIXME configura Apps no heoku (mongoDB, URLs, parametros, application.properties, Travis, etc..)
 
 }
