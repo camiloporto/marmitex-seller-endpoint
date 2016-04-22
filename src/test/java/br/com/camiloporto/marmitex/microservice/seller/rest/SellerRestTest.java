@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,13 +48,16 @@ public class SellerRestTest extends AbstractTestNGSpringContextTests {
     @Autowired
     private SellerService sellerService;
 
+    @Autowired
+    FilterChainProxy filterChain;
 
     private MockMvc mvc;
     private ObjectMapper objectMapper;
 
     @BeforeClass
     public void setUp() {
-        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .build();
         objectMapper = new ObjectMapper();
     }
 
@@ -66,7 +71,8 @@ public class SellerRestTest extends AbstractTestNGSpringContextTests {
         Seller s = new Seller();
         s.setName("Espaco e Sabor");
         s.setAddress("Jaguarari, 1056, lagoa nova");
-        s.setProfileId("camiloporto@email.com");
+        String profileId = "camiloporto@email.com";
+        s.setProfileId(profileId);
 
         MenuOption rice = new MenuOption("Rice");
         MenuOption bean = new MenuOption("Bean");
@@ -93,9 +99,12 @@ public class SellerRestTest extends AbstractTestNGSpringContextTests {
         s.setMenus(Arrays.asList(mon, tue));
 
         String json = objectMapper.writeValueAsString(s);
-        System.out.println(json);
+
+        UsernamePasswordAuthenticationToken principal = new UsernamePasswordAuthenticationToken(profileId, "pass");
+
         mvc.perform(
             post("/seller")
+                .principal(principal)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .content(json)
@@ -104,7 +113,7 @@ public class SellerRestTest extends AbstractTestNGSpringContextTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").exists());
 
-        List<Seller> result = sellerRepository.findByProfileId("camiloporto@email.com");
+        List<Seller> result = sellerRepository.findByProfileId(profileId);
         Assert.assertFalse(result.isEmpty());
     }
 
@@ -114,7 +123,8 @@ public class SellerRestTest extends AbstractTestNGSpringContextTests {
         Seller s = new Seller();
         s.setName("Espaco e Sabor");
         s.setAddress("Jaguarari, 1056, lagoa nova");
-        s.setProfileId("camiloporto@email.com");
+        String profileId = "camiloporto@email.com";
+        s.setProfileId(profileId);
 
         MenuOption rice = new MenuOption("Rice");
         MenuOption bean = new MenuOption("Bean");
@@ -140,16 +150,19 @@ public class SellerRestTest extends AbstractTestNGSpringContextTests {
 
         s.setMenus(Arrays.asList(mon, tue));
 
-        Seller saved = sellerService.save(s);
+        sellerService.save(s);
+
+        UsernamePasswordAuthenticationToken principal = new UsernamePasswordAuthenticationToken(profileId, "pass");
 
         mvc.perform(
                 get("/seller/")
-                        .param("profileId", s.getProfileId())
+                        .principal(principal)
                         .accept(MediaType.APPLICATION_JSON_UTF8))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.profileId").value(profileId))
                 .andExpect(jsonPath("$.menus[*].categories").exists());
 
     }

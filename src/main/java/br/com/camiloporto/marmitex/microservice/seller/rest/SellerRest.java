@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,9 @@ public class SellerRest {
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Map<String, Object> save(@RequestBody Seller seller) {
+    public Map<String, Object> save(@RequestBody Seller seller,
+                                    Principal principal) {
+        seller.setProfileId(principal.getName());
         Seller saved = sellerService.save(seller);
         Map<String, Object> result = new HashMap<>();
         result.put("id", saved.getId());
@@ -37,7 +40,10 @@ public class SellerRest {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
-    public @ResponseBody Seller get(@RequestParam("profileId") String profileId) {
+    public @ResponseBody Seller get(
+            Principal principal) {
+
+        String profileId = principal.getName();
         List<Seller> result = sellerService.findByProfile(profileId);
         if(!result.isEmpty()) {
             //FIXME should a profile have more than one Seller?
